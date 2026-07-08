@@ -1,21 +1,26 @@
-import axios from 'axios';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+export async function apiFetch<T = any>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
 
-// Token add کریں requests میں
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw { status: response.status, ...data };
   }
-  return config;
-});
 
-export default apiClient;
+  return data;
+}
