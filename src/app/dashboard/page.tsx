@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getStoredUser, isAuthenticated, logout, User } from "@/services/auth";
+import Link from "next/link";
+import { getStoredUser, isAuthenticated, logout, hasPermission, User } from "@/services/auth";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -22,6 +23,9 @@ export default function DashboardPage() {
   }
 
   if (!user) return null;
+
+  const canViewUsers = hasPermission("users.view");
+  const canViewClients = hasPermission("clients.view");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,11 +48,36 @@ export default function DashboardPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold text-gray-900">
-          Welcome back, {user.name}! 👋
+          Welcome back, {user.name}!
         </h2>
         <p className="text-gray-500 mt-1">
-          Dashboard modules Phase 2 mein add honge.
+          Yahan se apne CRM modules manage karein.
         </p>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {canViewUsers && (
+            <Link
+              href="/dashboard/users"
+              className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-gray-900">User Management</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Manage users, roles, and access.
+              </p>
+            </Link>
+          )}
+          {canViewClients && (
+            <Link
+              href="/dashboard/clients"
+              className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-gray-900">Clients</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Manage your customers and companies.
+              </p>
+            </Link>
+          )}
+        </div>
       </main>
     </div>
   );

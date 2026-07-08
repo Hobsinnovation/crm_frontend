@@ -1,12 +1,29 @@
 import { apiFetch } from "@/lib/api";
 
+export interface Permission {
+  id: number;
+  name: string;
+  display_name: string;
+  module: string;
+  action: string;
+}
+
+export interface RoleRelation {
+  id: number;
+  name: string;
+  display_name: string;
+  permissions?: Permission[];
+}
+
 export interface User {
   id: number;
   name: string;
   email: string;
   role: string;
+  role_id: number | null;
   is_active: boolean;
   avatar?: string | null;
+  role_relation?: RoleRelation | null;
 }
 
 export interface AuthResponse {
@@ -61,4 +78,10 @@ export function getStoredUser(): User | null {
 export function isAuthenticated(): boolean {
   if (typeof window === "undefined") return false;
   return !!localStorage.getItem("token");
+}
+
+export function hasPermission(permissionName: string): boolean {
+  const user = getStoredUser();
+  if (!user?.role_relation?.permissions) return false;
+  return user.role_relation.permissions.some((p) => p.name === permissionName);
 }
