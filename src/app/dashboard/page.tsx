@@ -40,6 +40,7 @@ export default function DashboardPage() {
 
   const canViewUsers = hasPermission("users.view");
   const canViewClients = hasPermission("clients.view");
+  const canViewLeads = hasPermission("leads.view");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -207,6 +208,17 @@ export default function DashboardPage() {
               <h3 className="font-semibold text-gray-900">Clients</h3>
               <p className="text-sm text-gray-500 mt-1">
                 Manage your customers and companies.
+              </p>
+            </Link>
+          )}
+          {canViewLeads && (
+            <Link
+              href="/dashboard/leads"
+              className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-gray-900">Leads</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Track your sales pipeline and conversions.
               </p>
             </Link>
           )}
