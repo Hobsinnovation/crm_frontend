@@ -41,6 +41,7 @@ export default function DashboardPage() {
   const canViewUsers = hasPermission("users.view");
   const canViewClients = hasPermission("clients.view");
   const canViewLeads = hasPermission("leads.view");
+  const canViewDomains = hasPermission("domains.view");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,7 +105,11 @@ export default function DashboardPage() {
                   <StatCard
                     title="Domains"
                     value={stats.domains.total}
-                    sub="Registered"
+                    sub={
+                      stats.domains.expiring_soon
+                        ? `⚠ ${stats.domains.expiring_soon} expiring soon`
+                        : "All healthy"
+                    }
                     color="purple"
                   />
                 )}
@@ -219,6 +224,17 @@ export default function DashboardPage() {
               <h3 className="font-semibold text-gray-900">Leads</h3>
               <p className="text-sm text-gray-500 mt-1">
                 Track your sales pipeline and conversions.
+              </p>
+            </Link>
+          )}
+          {canViewDomains && (
+            <Link
+              href="/dashboard/domains"
+              className="block p-6 bg-white rounded-lg shadow hover:shadow-md transition"
+            >
+              <h3 className="font-semibold text-gray-900">Domains</h3>
+              <p className="text-sm text-gray-500 mt-1">
+                Track expiry dates and renewals.
               </p>
             </Link>
           )}

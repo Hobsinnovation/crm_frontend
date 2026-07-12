@@ -22,7 +22,7 @@ export interface DashboardStats {
     created_at: string;
   }[];
   leads?: { total: number };
-  domains?: { total: number };
+  domains?: { total: number; expiring_soon?: number };
   invoices?: { total: number };
 }
 
