@@ -187,115 +187,110 @@ export default function DomainsPage() {
           </div>
         )}
 
+        {/* ================= DOMAIN CARDS ================= */}
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-                <tr>
-                  <th className="px-4 py-3">Domain</th>
-                  <th className="px-4 py-3">Client</th>
-                  <th className="px-4 py-3">Registrar</th>
-                  <th className="px-4 py-3">Expiry</th>
-                  <th className="px-4 py-3">Auto-Renew</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {domains.map((domain) => (
-                  <tr key={domain.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900">
-                        {domain.name}
-                        {domain.is_critical && (
-                          <span className="ml-2 text-xs text-red-600" title="Critical domain">
-                            ★
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {domain.annual_cost
-                          ? `$${Number(domain.annual_cost).toFixed(2)}/yr`
-                          : ""}
-                      </p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {domain.client?.name ?? "-"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {domain.registrar ?? "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <ExpiryBadge days={domain.days_to_expiry} />
-                    </td>
-                    <td className="px-4 py-3">
-                      {canUpdate ? (
-                        <button
-                          onClick={() => handleToggleRenewal(domain.id)}
-                          className={`relative w-10 h-5 rounded-full transition ${
-                            domain.auto_renewal ? "bg-green-500" : "bg-gray-300"
-                          }`}
-                          title={
-                            domain.auto_renewal
-                              ? "Auto-renewal ON"
-                              : "Auto-renewal OFF"
-                          }
-                        >
-                          <span
-                            className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${
-                              domain.auto_renewal ? "left-5" : "left-0.5"
-                            }`}
-                          />
-                        </button>
-                      ) : (
-                        <span className="text-xs text-gray-600">
-                          {domain.auto_renewal ? "On" : "Off"}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {domains.map((domain) => (
+              <div
+                key={domain.id}
+                className="bg-white rounded-lg shadow hover:shadow-md transition p-5 flex flex-col"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {domain.name}
+                      {domain.is_critical && (
+                        <span className="ml-2 text-xs text-red-600" title="Critical domain">
+                          ★
                         </span>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {domain.client?.name ?? "No client"}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      STATUS_COLORS[domain.status]
+                    }`}
+                  >
+                    {STATUS_LABELS[domain.status]}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-1 text-sm">
+                  <p className="text-gray-600">
+                    <span className="text-gray-400">Registrar: </span>
+                    {domain.registrar ?? "-"}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="text-gray-400">Annual Cost: </span>
+                    {domain.annual_cost
+                      ? `$${Number(domain.annual_cost).toFixed(2)}/yr`
+                      : "-"}
+                  </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="text-gray-400">Expiry:</span>
+                    <ExpiryBadge days={domain.days_to_expiry} />
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                  {canUpdate ? (
+                    <button
+                      onClick={() => handleToggleRenewal(domain.id)}
+                      className={`relative w-10 h-5 rounded-full transition ${
+                        domain.auto_renewal ? "bg-green-500" : "bg-gray-300"
+                      }`}
+                      title={
+                        domain.auto_renewal
+                          ? "Auto-renewal ON"
+                          : "Auto-renewal OFF"
+                      }
+                    >
                       <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          STATUS_COLORS[domain.status]
+                        className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${
+                          domain.auto_renewal ? "left-5" : "left-0.5"
                         }`}
+                      />
+                    </button>
+                  ) : (
+                    <span className="text-xs text-gray-600">
+                      Auto-renew: {domain.auto_renewal ? "On" : "Off"}
+                    </span>
+                  )}
+
+                  <div className="space-x-1">
+                    {canUpdate && (
+                      <button
+                        onClick={() => {
+                          setEditingDomain(domain);
+                          setShowModal(true);
+                        }}
+                        className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
                       >
-                        {STATUS_LABELS[domain.status]}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-right space-x-1 whitespace-nowrap">
-                      {canUpdate && (
-                        <button
-                          onClick={() => {
-                            setEditingDomain(domain);
-                            setShowModal(true);
-                          }}
-                          className="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(domain.id)}
-                          className="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {domains.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                      No domains found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                        Edit
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(domain.id)}
+                        className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {domains.length === 0 && (
+              <p className="text-gray-400 col-span-full text-center py-8">
+                No domains found.
+              </p>
+            )}
           </div>
         )}
       </main>

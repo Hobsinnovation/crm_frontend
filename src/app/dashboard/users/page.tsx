@@ -2,17 +2,33 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { isAuthenticated, hasPermission, User } from "@/services/auth";
+import { getUsers, getRoles, updateUserRole, toggleUserStatus, deleteUser, createUser, Role } from "@/services/users";
 import {
-  getUsers,
-  getRoles,
-  updateUserRole,
-  toggleUserStatus,
-  deleteUser,
-  createUser,
-  Role,
-} from "@/services/users";
+  pageShellCls,
+  PageHeader,
+  PageMain,
+  PrimaryButton,
+  SecondaryButton,
+  RowAction,
+  inputCls,
+  Field,
+  SearchInput,
+  Modal,
+  ErrorBanner,
+  EmptyState,
+  SkeletonTable,
+  Avatar,
+  tableWrapCls,
+  theadCls,
+  thCls,
+  tdCls,
+  trCls,
+  IconPlus,
+  IconTrash,
+  IconCheck,
+  IconX,
+} from "@/components/ui/kit";
 
 export default function UsersPage() {
   const router = useRouter();
@@ -32,10 +48,7 @@ export default function UsersPage() {
     setLoading(true);
     setError("");
     try {
-      const [usersData, rolesData] = await Promise.all([
-        getUsers(search),
-        getRoles(),
-      ]);
+      const [usersData, rolesData] = await Promise.all([getUsers(search), getRoles()]);
       setUsers(usersData.data);
       setRoles(rolesData);
     } catch (err: any) {
@@ -93,72 +106,57 @@ export default function UsersPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-gray-500 hover:text-gray-900">
-              Back
-            </Link>
-            <h1 className="text-xl font-bold text-gray-900">User Management</h1>
-          </div>
-          {canCreate && (
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-md"
-            >
-              + Add User
-            </button>
-          )}
-        </div>
-      </header>
+    <div className={pageShellCls}>
+      <PageHeader
+        title="User Management"
+        backHref="/dashboard"
+        action={
+          canCreate && (
+            <PrimaryButton onClick={() => setShowModal(true)}>
+              <IconPlus />
+              Add User
+            </PrimaryButton>
+          )
+        }
+      />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full max-w-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+      <PageMain>
+        <div className="mb-4 flex flex-wrap gap-3">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search by name or email..." />
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-md bg-red-50 text-red-600 text-sm">
-            {error}
-          </div>
-        )}
+        {error && <ErrorBanner message={error} />}
 
         {loading ? (
-          <p className="text-gray-500">Loading...</p>
+          <SkeletonTable rows={6} />
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+          <div className={tableWrapCls}>
+            <table className="w-full text-sm">
+              <thead className={theadCls}>
                 <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
+                  <th className={thCls}>Name</th>
+                  <th className={thCls}>Email</th>
+                  <th className={thCls}>Role</th>
+                  <th className={thCls}>Status</th>
+                  <th className={`${thCls} text-right`}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody>
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
-                      {user.name}
+                  <tr key={user.id} className={trCls}>
+                    <td className={tdCls}>
+                      <div className="flex items-center gap-3">
+                        <Avatar name={user.name} />
+                        <span className="font-medium">{user.name}</span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{user.email}</td>
-                    <td className="px-4 py-3">
+                    <td className={`${tdCls} text-[#5B5F6E]`}>{user.email}</td>
+                    <td className={tdCls}>
                       {canUpdate ? (
                         <select
                           value={user.role_id ?? ""}
-                          onChange={(e) =>
-                            handleRoleChange(user.id, Number(e.target.value))
-                          }
-                          className="border border-gray-300 rounded px-2 py-1 text-sm"
+                          onChange={(e) => handleRoleChange(user.id, Number(e.target.value))}
+                          className={`${inputCls} w-auto py-1.5 text-xs`}
                         >
                           {roles.map((role) => (
                             <option key={role.id} value={role.id}>
@@ -167,46 +165,41 @@ export default function UsersPage() {
                           ))}
                         </select>
                       ) : (
-                        <span className="text-gray-700">
-                          {user.role_relation?.display_name ?? user.role}
-                        </span>
+                        <span className="text-[#5B5F6E]">{user.role_relation?.display_name ?? user.role}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className={tdCls}>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs ${
-                          user.is_active
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          user.is_active ? "bg-[#E7F5F0] text-[#127A5D]" : "bg-[#FDEBEA] text-[#C23B34]"
                         }`}
                       >
                         {user.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right space-x-2">
-                      {canUpdate && (
-                        <button
-                          onClick={() => handleToggle(user.id)}
-                          className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                        >
-                          {user.is_active ? "Deactivate" : "Activate"}
-                        </button>
-                      )}
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(user.id)}
-                          className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-                        >
-                          Delete
-                        </button>
-                      )}
+                    <td className={`${tdCls} text-right`}>
+                      <div className="flex justify-end gap-1.5">
+                        {canUpdate && (
+                          <RowAction
+                            onClick={() => handleToggle(user.id)}
+                            icon={user.is_active ? <IconX className="h-3.5 w-3.5" /> : <IconCheck />}
+                          >
+                            {user.is_active ? "Deactivate" : "Activate"}
+                          </RowAction>
+                        )}
+                        {canDelete && (
+                          <RowAction onClick={() => handleDelete(user.id)} variant="danger" icon={<IconTrash />}>
+                            Delete
+                          </RowAction>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {users.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-gray-400">
-                      No users found.
+                    <td colSpan={5} className="px-4 py-2">
+                      <EmptyState message="No users found." />
                     </td>
                   </tr>
                 )}
@@ -214,7 +207,7 @@ export default function UsersPage() {
             </table>
           </div>
         )}
-      </main>
+      </PageMain>
 
       {showModal && (
         <AddUserModal
@@ -230,15 +223,7 @@ export default function UsersPage() {
   );
 }
 
-function AddUserModal({
-  roles,
-  onClose,
-  onSuccess,
-}: {
-  roles: Role[];
-  onClose: () => void;
-  onSuccess: () => void;
-}) {
+function AddUserModal({ roles, onClose, onSuccess }: { roles: Role[]; onClose: () => void; onSuccess: () => void }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -260,9 +245,7 @@ function AddUserModal({
       });
       onSuccess();
     } catch (err: any) {
-      const firstError = err.errors
-        ? (Object.values(err.errors)[0] as string[])[0]
-        : err.message;
+      const firstError = err.errors ? (Object.values(err.errors)[0] as string[])[0] : err.message;
       setError(firstError || "Failed to create user.");
     } finally {
       setLoading(false);
@@ -270,42 +253,41 @@ function AddUserModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Add New User</h2>
+    <Modal
+      title="Add New User"
+      onClose={onClose}
+      footer={
+        <>
+          <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
+          <PrimaryButton onClick={handleSubmit} disabled={loading}>
+            {loading ? "Creating..." : "Create User"}
+          </PrimaryButton>
+        </>
+      }
+    >
+      {error && <ErrorBanner message={error} />}
 
-        {error && (
-          <div className="mb-4 p-3 rounded-md bg-red-50 text-red-600 text-sm">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-3">
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
+      <div className="space-y-3">
+        <Field label="Full Name">
+          <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={inputCls} />
+        </Field>
+        <Field label="Email">
+          <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputCls} />
+        </Field>
+        <Field label="Password">
           <input
             type="password"
-            placeholder="Password (min 8 chars)"
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            placeholder="Min 8 characters"
+            className={inputCls}
           />
+        </Field>
+        <Field label="Role">
           <select
             value={form.role_id}
             onChange={(e) => setForm({ ...form, role_id: Number(e.target.value) })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className={inputCls}
           >
             {roles.map((role) => (
               <option key={role.id} value={role.id}>
@@ -313,24 +295,8 @@ function AddUserModal({
               </option>
             ))}
           </select>
-        </div>
-
-        <div className="flex justify-end gap-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50"
-          >
-            {loading ? "Creating..." : "Create User"}
-          </button>
-        </div>
+        </Field>
       </div>
-    </div>
+    </Modal>
   );
 }

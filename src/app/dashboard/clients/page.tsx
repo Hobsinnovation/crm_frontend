@@ -143,90 +143,92 @@ export default function ClientsPage() {
           </div>
         )}
 
+        {/* ================= CLIENT CARDS ================= */}
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-                <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Company</th>
-                  <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Phone</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {clients.map((client) => (
+              <div
+                key={client.id}
+                className="bg-white rounded-lg shadow hover:shadow-md transition p-5 flex flex-col"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
                       {client.name}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    </h3>
+                    <p className="text-xs text-gray-500">
                       {client.company || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {client.email || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {client.phone || "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {canUpdate ? (
-                        <select
-                          value={client.status}
-                          onChange={(e) =>
-                            handleStatusChange(client.id, e.target.value)
-                          }
-                          className={`px-2 py-1 rounded-full text-xs capitalize border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                            STATUS_COLORS[client.status]
-                          }`}
-                        >
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
-                          <option value="suspended">Suspended</option>
-                        </select>
-                      ) : (
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs capitalize ${
-                            STATUS_COLORS[client.status]
-                          }`}
-                        >
-                          {client.status}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right space-x-2">
-                      {canUpdate && (
-                        <button
-                          onClick={() => openEdit(client)}
-                          className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(client.id)}
-                          className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {clients.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
-                      No clients found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                    </p>
+                  </div>
+                  {canUpdate ? (
+                    <select
+                      value={client.status}
+                      onChange={(e) =>
+                        handleStatusChange(client.id, e.target.value)
+                      }
+                      className={`px-2 py-1 rounded-full text-xs capitalize border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                        STATUS_COLORS[client.status]
+                      }`}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="suspended">Suspended</option>
+                    </select>
+                  ) : (
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs capitalize ${
+                        STATUS_COLORS[client.status]
+                      }`}
+                    >
+                      {client.status}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-4 space-y-1 text-sm">
+                  <p className="text-gray-600 truncate">
+                    <span className="text-gray-400">Email: </span>
+                    {client.email || "-"}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="text-gray-400">Phone: </span>
+                    {client.phone || "-"}
+                  </p>
+                  {(client.city || client.country) && (
+                    <p className="text-gray-600">
+                      <span className="text-gray-400">Location: </span>
+                      {[client.city, client.country].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-100 flex justify-end gap-2">
+                  {canUpdate && (
+                    <button
+                      onClick={() => openEdit(client)}
+                      className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                    >
+                      Edit
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      onClick={() => handleDelete(client.id)}
+                      className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+            {clients.length === 0 && (
+              <p className="text-gray-400 col-span-full text-center py-8">
+                No clients found.
+              </p>
+            )}
           </div>
         )}
       </main>

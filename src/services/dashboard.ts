@@ -23,7 +23,13 @@ export interface DashboardStats {
   }[];
   leads?: { total: number };
   domains?: { total: number; expiring_soon?: number };
-  invoices?: { total: number };
+  invoices?: {
+    total: number;
+    paid?: number;
+    overdue?: number;
+    revenue?: number;
+    pending?: number;
+  };
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {

@@ -195,134 +195,135 @@ export default function LeadsPage() {
           </div>
         )}
 
+        {/* ================= LEAD CARDS ================= */}
         {loading ? (
           <p className="text-gray-500">Loading...</p>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-                <tr>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Company</th>
-                  <th className="px-4 py-3">Source</th>
-                  <th className="px-4 py-3">Value</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Assigned To</th>
-                  <th className="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-gray-900">{lead.name}</p>
-                      <p className="text-xs text-gray-500">{lead.email || "-"}</p>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {leads.map((lead) => (
+              <div
+                key={lead.id}
+                className="bg-white rounded-lg shadow hover:shadow-md transition p-5 flex flex-col"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-gray-900">
+                      {lead.name}
+                    </h3>
+                    <p className="text-xs text-gray-500">
                       {lead.company || "-"}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 capitalize">
-                      {lead.source}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {lead.estimated_value
-                        ? Number(lead.estimated_value).toLocaleString()
-                        : "-"}
-                    </td>
-                    <td className="px-4 py-3">
-                      {canUpdate && !lead.converted_to_client_id ? (
-                        <select
-                          value={lead.status}
-                          onChange={(e) =>
-                            handleStatusChange(lead.id, e.target.value)
-                          }
-                          className={`px-2 py-1 rounded-full text-xs border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                            STATUS_COLORS[lead.status]
-                          }`}
-                        >
-                          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                            <option key={value} value={value}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            STATUS_COLORS[lead.status]
-                          }`}
-                        >
-                          {STATUS_LABELS[lead.status]}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {canAssign ? (
-                        <select
-                          value={lead.assigned_to ?? ""}
-                          onChange={(e) =>
-                            handleAssign(lead.id, Number(e.target.value))
-                          }
-                          className="border border-gray-300 rounded px-2 py-1 text-xs"
-                        >
-                          {users.map((u) => (
-                            <option key={u.id} value={u.id}>
-                              {u.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span className="text-gray-600 text-xs">
-                          {lead.assignee?.name ?? "-"}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right space-x-1 whitespace-nowrap">
-                      {canConvert && !lead.converted_to_client_id && (
-                        <button
-                          onClick={() => handleConvert(lead)}
-                          className="text-xs px-2 py-1 bg-green-600 hover:bg-green-700 text-white rounded"
-                          title="Convert to Client"
-                        >
-                          Convert
-                        </button>
-                      )}
-                      {lead.converted_to_client_id && (
-                        <span className="text-xs text-green-600 mr-1">
-                          ✓ Client
-                        </span>
-                      )}
-                      {canUpdate && (
-                        <button
-                          onClick={() => {
-                            setEditingLead(lead);
-                            setShowModal(true);
-                          }}
-                          className="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-                        >
-                          Edit
-                        </button>
-                      )}
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(lead.id)}
-                          className="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {leads.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
-                      No leads found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                    </p>
+                  </div>
+                  {canUpdate && !lead.converted_to_client_id ? (
+                    <select
+                      value={lead.status}
+                      onChange={(e) =>
+                        handleStatusChange(lead.id, e.target.value)
+                      }
+                      className={`px-2 py-1 rounded-full text-xs border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                        STATUS_COLORS[lead.status]
+                      }`}
+                    >
+                      {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        STATUS_COLORS[lead.status]
+                      }`}
+                    >
+                      {STATUS_LABELS[lead.status]}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-4 space-y-1 text-sm">
+                  <p className="text-gray-600 truncate">
+                    <span className="text-gray-400">Email: </span>
+                    {lead.email || "-"}
+                  </p>
+                  <p className="text-gray-600 capitalize">
+                    <span className="text-gray-400 normal-case">Source: </span>
+                    {lead.source}
+                  </p>
+                  <p className="text-gray-600">
+                    <span className="text-gray-400">Value: </span>
+                    {lead.estimated_value
+                      ? Number(lead.estimated_value).toLocaleString()
+                      : "-"}
+                  </p>
+                  <div className="pt-1">
+                    {canAssign ? (
+                      <select
+                        value={lead.assigned_to ?? ""}
+                        onChange={(e) =>
+                          handleAssign(lead.id, Number(e.target.value))
+                        }
+                        className="border border-gray-300 rounded px-2 py-1 text-xs"
+                      >
+                        {users.map((u) => (
+                          <option key={u.id} value={u.id}>
+                            {u.name}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <p className="text-gray-600">
+                        <span className="text-gray-400">Assigned to: </span>
+                        {lead.assignee?.name ?? "-"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                  {lead.converted_to_client_id ? (
+                    <span className="text-xs text-green-600">✓ Client</span>
+                  ) : (
+                    <span />
+                  )}
+                  <div className="space-x-1">
+                    {canConvert && !lead.converted_to_client_id && (
+                      <button
+                        onClick={() => handleConvert(lead)}
+                        className="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded"
+                        title="Convert to Client"
+                      >
+                        Convert
+                      </button>
+                    )}
+                    {canUpdate && (
+                      <button
+                        onClick={() => {
+                          setEditingLead(lead);
+                          setShowModal(true);
+                        }}
+                        className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(lead.id)}
+                        className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            {leads.length === 0 && (
+              <p className="text-gray-400 col-span-full text-center py-8">
+                No leads found.
+              </p>
+            )}
           </div>
         )}
       </main>
