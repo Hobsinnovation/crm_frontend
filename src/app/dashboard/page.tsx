@@ -262,6 +262,9 @@ export default function DashboardPage() {
           {canViewInvoices && (
             <ModuleCard href="/dashboard/invoices" icon={<IconReceipt />} title="Invoices" desc="Billing, payments, and overdue tracking." accent="#C99A2E" />
           )}
+          {canViewUsers && (
+            <ModuleCard href="/dashboard/activity" icon={<IconClock />} title="Activity Logs" desc="Audit trail of all system actions." accent="#5B5F6E" />
+          )}
         </div>
       </main>
     </div>
@@ -474,6 +477,14 @@ function IconChevronRight({ className = "h-4 w-4" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
       <path d="M9 6l6 6-6 6" />
+    </svg>
+  );
+}
+function IconClock({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 3" />
     </svg>
   );
 }
