@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Space_Grotesk, Manrope, IBM_Plex_Mono } from "next/font/google";
 import { getStoredUser, isAuthenticated, logout, hasPermission, User } from "@/services/auth";
 import { getDashboardStats, DashboardStats } from "@/services/dashboard";
+import NotificationBell from "@/components/NotificationBell";
 
 /**
  * Type system
@@ -83,6 +84,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <div className="hidden items-center gap-2.5 sm:flex">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#EDEFFB] font-[family-name:var(--font-display)] text-xs font-semibold text-[#4B5FE0]">
                 {getInitials(user.name)}
